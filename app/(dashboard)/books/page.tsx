@@ -25,6 +25,7 @@ type Book = {
   coverImage?: string;
   image?: { url?: string };
   category?: { _id?: string; name?: string };
+  is18Plus?: boolean;
 };
 type BooksResp = { books?: Book[]; meta?: { totalPage?: number } };
 type Profile = { _id?: string };
@@ -39,6 +40,7 @@ const empty = {
   price: "",
   description: "",
   stock: "1",
+  is18Plus: false,
 };
 
 function parseCsv(text: string) {
@@ -99,6 +101,14 @@ function resolveCategoryId(value: string, categories: Category[]) {
   return match?._id || "";
 }
 
+function parseOptionalBoolean(value: string) {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return false;
+  if (["true", "1", "yes", "oui"].includes(normalized)) return true;
+  if (["false", "0", "no", "non"].includes(normalized)) return false;
+  return undefined;
+}
+
 function parseBulkBooksCsv(text: string, categories: Category[]) {
   const rows = parseCsv(text);
   if (rows.length < 2) {
@@ -133,9 +143,11 @@ function parseBulkBooksCsv(text: string, categories: Category[]) {
     const price = row[indexOf("price")] || "";
     const stock = row[quantityIndex] || "";
     const descriptionIndex = indexOf("description");
+    const is18PlusIndex = indexOf("is18plus");
     const category = resolveCategoryId(categoryValue, categories);
     const numericPrice = Number(price);
     const stockQuantity = Number(stock);
+    const is18Plus = parseOptionalBoolean(is18PlusIndex >= 0 ? row[is18PlusIndex] || "" : "");
 
     if (!title || !author || !categoryValue || !price || !stock) {
       errors.push(`Row ${rowNumber}: title, author, category, price, and quantity are required.`);
@@ -157,6 +169,11 @@ function parseBulkBooksCsv(text: string, categories: Category[]) {
       return;
     }
 
+    if (is18Plus === undefined) {
+      errors.push(`Row ${rowNumber}: is18Plus must be true or false.`);
+      return;
+    }
+
     books.push({
       rowNumber,
       title,
@@ -165,6 +182,7 @@ function parseBulkBooksCsv(text: string, categories: Category[]) {
       price,
       stock,
       description: descriptionIndex >= 0 ? row[descriptionIndex] || "" : "",
+      is18Plus,
     });
   });
 
@@ -219,7 +237,7 @@ function BookForm({
               <Input value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} placeholder="Daniel Kahneman" />
             </div>
             <div>
-              <label className="mb-2 block text-[14px] font-medium text-[#202124]">Price ($) *</label>
+              <label className="mb-2 block text-[14px] font-medium text-[#202124]">Price (€) *</label>
               <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="22" />
             </div>
           </div>
@@ -260,6 +278,15 @@ function BookForm({
               placeholder="A book on behavioral psychology and decision-making."
             />
           </div>
+          <label className="flex cursor-pointer items-center gap-3 rounded-[10px] border border-[#cfd4dc] bg-[#f8fbff] px-4 py-3 text-[14px] font-medium text-[#202124]">
+            <input
+              type="checkbox"
+              checked={form.is18Plus}
+              onChange={(event) => setForm({ ...form, is18Plus: event.target.checked })}
+              className="size-4 accent-[#6d98c0]"
+            />
+            Book restricted to ages 18+
+          </label>
         </div>
       </div>
       <div className="mt-6 flex justify-end gap-3">
@@ -290,12 +317,12 @@ function BulkBookUpload({
   const [errors, setErrors] = useState<string[]>([]);
   const categoryExample = categories[0]?.name || "Fiction";
   const sampleCsv = [
-    "title,author,category,price,quantity,description",
-    `"Atomic Habits","James Clear","${categoryExample}",18.99,20,"Build better habits"`,
-    `"Deep Work","Cal Newport","${categoryExample}",16.5,15,"Focus without distraction"`,
-    `"The Alchemist","Paulo Coelho","${categoryExample}",12.99,18,"A journey of purpose and dreams"`,
-    `"Ikigai","Hector Garcia","${categoryExample}",14.25,12,"Find meaning in everyday life"`,
-    `"The Psychology of Money","Morgan Housel","${categoryExample}",17.75,10,"Timeless lessons about wealth"`,
+    "title,author,category,price,quantity,description,is18Plus",
+    `"Atomic Habits","James Clear","${categoryExample}",18.99,20,"Build better habits",false`,
+    `"Deep Work","Cal Newport","${categoryExample}",16.5,15,"Focus without distraction",false`,
+    `"The Alchemist","Paulo Coelho","${categoryExample}",12.99,18,"A journey of purpose and dreams",false`,
+    `"Ikigai","Hector Garcia","${categoryExample}",14.25,12,"Find meaning in everyday life",false`,
+    `"The Psychology of Money","Morgan Housel","${categoryExample}",17.75,10,"Timeless lessons about wealth",true`,
   ].join("\n");
   const csvColumns = [
     { name: "title", required: true, example: "Atomic Habits" },
@@ -304,6 +331,7 @@ function BulkBookUpload({
     { name: "price", required: true, example: "18.99" },
     { name: "quantity", required: true, example: "20" },
     { name: "description", required: false, example: "Build better habits" },
+    { name: "is18Plus", required: false, example: "false" },
   ];
 
   const downloadSample = () => {
@@ -408,7 +436,7 @@ function BulkBookUpload({
               Preview: {books.length} valid {books.length === 1 ? "book" : "books"}
             </div>
             <div className="max-h-[260px] overflow-auto">
-              <table className="w-full min-w-[960px] text-left text-[13px]">
+              <table className="w-full min-w-[1040px] text-left text-[13px]">
                 <thead className="bg-white text-[#5b6371]">
                   <tr>
                     <th className="px-4 py-3 font-medium">Row</th>
@@ -418,6 +446,7 @@ function BulkBookUpload({
                     <th className="px-4 py-3 font-medium">Price</th>
                     <th className="px-4 py-3 font-medium">Quantity</th>
                     <th className="px-4 py-3 font-medium">Description</th>
+                    <th className="px-4 py-3 font-medium">18+</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -430,6 +459,7 @@ function BulkBookUpload({
                       <td className="px-4 py-3 text-[#5b6371]">{book.price}</td>
                       <td className="px-4 py-3 text-[#5b6371]">{book.stock}</td>
                       <td className="max-w-[260px] truncate px-4 py-3 text-[#5b6371]">{book.description || "N/A"}</td>
+                      <td className="px-4 py-3 text-[#5b6371]">{book.is18Plus ? "Yes" : "No"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -517,6 +547,7 @@ export default function BooksPage() {
         fd.set("description", row.description);
         fd.set("category", row.category);
         fd.set("stock", row.stock);
+        fd.set("is18Plus", String(row.is18Plus));
 
         try {
           await createBook(fd);
@@ -598,6 +629,7 @@ export default function BooksPage() {
     fd.set("description", form.description);
     if (form.category) fd.set("category", form.category);
     fd.set("stock", String(stockQuantity));
+    fd.set("is18Plus", String(form.is18Plus));
     if (file) fd.set("coverImage", file);
 
     if (id) {
@@ -657,6 +689,11 @@ export default function BooksPage() {
                   <span className="absolute right-2 top-2 rounded-md bg-[#103670] px-2 py-1 text-[11px] font-semibold text-white">
                     {inStock ? `${stockQuantity} in stock` : "Stock out"}
                   </span>
+                  {book.is18Plus ? (
+                    <span className="absolute left-2 top-2 rounded-md bg-[#b42318] px-2 py-1 text-[11px] font-semibold text-white">
+                      18+
+                    </span>
+                  ) : null}
                 </div>
                 <div className="mt-3 space-y-1">
                   <div className="flex items-start justify-between gap-2">
@@ -669,7 +706,7 @@ export default function BooksPage() {
                   <p className="flex items-center gap-1 text-[12px] text-[#5b6371]">
                     <MapPin className="size-3.5 text-[#3d8ef5]" /> {book.category?.name || "Uncategorized"}
                   </p>
-                  <p className="text-[14px] font-semibold text-[#3d8ef5]">$ {(book.price ?? 0).toFixed(2)}</p>
+                  <p className="text-[14px] font-semibold text-[#3d8ef5]">{formatCurrency(book.price ?? 0)}</p>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <Button variant="outline" className="border-[#3d8ef5] text-[#3d8ef5]" onClick={() => setEditing(book)}>
@@ -722,6 +759,7 @@ export default function BooksPage() {
                     : "0"
                   : String(editing.stock ?? (editing.inStock ? 1 : 0)),
               coverImage: getAssetUrl(editing.image || editing.coverImage) || undefined,
+              is18Plus: Boolean(editing.is18Plus),
             }}
             onCancel={() => setEditing(null)}
             onSubmit={(form, file) => submitForm(form, file, editing._id)}
@@ -757,6 +795,9 @@ export default function BooksPage() {
               >
                 <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] bg-[#e3e6ec]">
                   {cover ? <Image src={cover} alt={book.title || ""} fill className="object-cover" sizes="240px" /> : null}
+                  {book.is18Plus ? (
+                    <span className="absolute left-2 top-2 rounded-md bg-[#b42318] px-2 py-1 text-[11px] font-semibold text-white">18+</span>
+                  ) : null}
                 </div>
                 <h3 className="mt-2 text-[14px] font-semibold text-[#202124]">{book.title || "Untitled book"}</h3>
                 <p className="text-[12px] text-[#5b6371]">{book.author || "Unknown author"}</p>

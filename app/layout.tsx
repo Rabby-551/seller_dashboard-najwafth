@@ -3,8 +3,8 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Seller Dashboard",
-  description: "Responsive seller dashboard for BookStore Hub",
+  title: "Tableau de bord vendeur",
+  description: "Tableau de bord vendeur de Books on Wheels",
   icons: {
     icon: "/assets/logo-icon.png",
     shortcut: "/assets/logo-icon.png",
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body>
         <Providers>{children}</Providers>
       </body>

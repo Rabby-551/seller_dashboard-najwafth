@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { changePassword, getProfile, updateProfile } from "@/lib/api";
 import { getAssetUrl } from "@/lib/utils";
+import { LanguageSelector } from "@/lib/i18n";
 
 type ProfileData = {
   name?: string;
@@ -46,6 +47,13 @@ export default function SettingsPage() {
 
   return (
     <PageFrame title="Setting" subtitle="Edit your personal information">
+      <SectionCard className="mb-6">
+        <h2 className="text-[20px] font-semibold text-[#202124]">Language</h2>
+        <p className="mt-1 text-[14px] text-[#5b6371]">Choose the language used throughout the seller dashboard.</p>
+        <div className="mt-4 max-w-[360px]">
+          <LanguageSelector />
+        </div>
+      </SectionCard>
       <SectionCard>
         <label className="flex cursor-pointer items-center gap-5">
           <div className="relative size-20 overflow-hidden rounded-full bg-[#d6c0aa]">

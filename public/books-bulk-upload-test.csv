@@ -1,9 +1,9 @@
-title,author,category,price,quantity,description
-"Atomic Habits","James Clear","Adventure",18.99,20,"Build better habits"
-"Deep Work","Cal Newport","Adventure",16.50,15,"Focus without distraction"
-"The Alchemist","Paulo Coelho","Adventure",12.99,18,"A journey of purpose and dreams"
-"Ikigai","Hector Garcia","Adventure",14.25,12,"Find meaning in everyday life"
-"The Psychology of Money","Morgan Housel","Adventure",17.75,10,"Timeless lessons about wealth"
-"Rich Dad Poor Dad","Robert Kiyosaki","Adventure",11.99,14,"Personal finance basics"
-"The Lean Startup","Eric Ries","Adventure",19.99,8,"Build and test business ideas"
-"Start With Why","Simon Sinek","Adventure",15.75,9,"How leaders inspire action"
+title,author,category,price,quantity,description,is18Plus
+"Atomic Habits","James Clear","Adventure",18.99,20,"Build better habits",false
+"Deep Work","Cal Newport","Adventure",16.50,15,"Focus without distraction",false
+"The Alchemist","Paulo Coelho","Adventure",12.99,18,"A journey of purpose and dreams",false
+"Ikigai","Hector Garcia","Adventure",14.25,12,"Find meaning in everyday life",false
+"The Psychology of Money","Morgan Housel","Adventure",17.75,10,"Timeless lessons about wealth",false
+"Rich Dad Poor Dad","Robert Kiyosaki","Adventure",11.99,14,"Personal finance basics",false
+"The Lean Startup","Eric Ries","Adventure",19.99,8,"Build and test business ideas",true
+"Start With Why","Simon Sinek","Adventure",15.75,9,"How leaders inspire action",false

@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { BookOpen, DollarSign, MapPin, Plus, ShoppingCart, Star, TrendingUp, Users } from "lucide-react";
+import { BookOpen, Euro, MapPin, Plus, ShoppingCart, Star, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
 import { MetricCard, PageFrame, PeriodTabs, SectionCard } from "@/components/seller/primitives";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export default function SalesOverviewPage() {
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
         <MetricCard label="Total Revenue" value={formatCurrency(metrics.totalRevenue ?? 0)} icon={<BookOpen className="size-5" />} iconBg="bg-[#3d8ef5]" iconColor="text-white" />
-        <MetricCard label="Admin Commission" value={formatCurrency(metrics.totalAdminCommission ?? 0)} icon={<DollarSign className="size-5" />} iconBg="bg-[#fe8a3b]" iconColor="text-white" />
+        <MetricCard label="Admin Commission" value={formatCurrency(metrics.totalAdminCommission ?? 0)} icon={<Euro className="size-5" />} iconBg="bg-[#fe8a3b]" iconColor="text-white" />
         <MetricCard label="Net Revenue" value={formatCurrency(metrics.netRevenue ?? 0)} icon={<TrendingUp className="size-5" />} iconBg="bg-[#16934b]" iconColor="text-white" />
         <MetricCard label="Total Orders" value={metrics.completedOrders ?? 0} icon={<ShoppingCart className="size-5" />} iconBg="bg-[#3d8ef5]" iconColor="text-white" />
         <MetricCard label="Avg. Order Value" value={formatCurrency(metrics.avgOrderValue ?? 0)} icon={<Users className="size-5" />} iconBg="bg-[#f87171]" iconColor="text-white" />
